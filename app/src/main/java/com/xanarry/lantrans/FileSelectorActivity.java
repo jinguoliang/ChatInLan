@@ -6,10 +6,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -61,6 +65,7 @@ public class FileSelectorActivity extends Activity {
      * 单选
      */
     private boolean isSingleSelector;
+    private List<FileBean> mCurrentFiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,35 @@ public class FileSelectorActivity extends Activity {
         } else {
             title.setText("选择保存目录");
         }
+        EditText inputBox = findViewById(R.id.search_input_box);
+        inputBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s)) {
+                    adapter.refreshItem(mCurrentFiles);
+                    return;
+                }
+                if (mCurrentFiles != null && adapter != null) {
+                    List<FileBean> files = new ArrayList<>();
+                    for (FileBean bean : mCurrentFiles) {
+                        if (bean.name.toLowerCase().contains(s.toString().toLowerCase())) {
+                            files.add(bean);
+                        }
+                    }
+                    adapter.refreshItem(files);
+                }
+            }
+        });
         isSingleSelector = intent.getBooleanExtra(keyIsSingleSelector, true);
         clazz = forName(className);
         File file = new File(rootPath);
@@ -209,6 +243,7 @@ public class FileSelectorActivity extends Activity {
             bean.name = subFile.getName();
             listFileBean.add(bean);
         }
+        mCurrentFiles = listFileBean;
         adapter.refreshItem(listFileBean);
         //((ListView) findViewById(R.id.lv)).setSelection(0);
     }

@@ -47,11 +47,18 @@
 
     </RelativeLayout>
 
+    <EditText
+        android:id="@+id/search_input_box"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:hint="Please input content to search"
+        android:layout_below="@id/layout_top_title"/>
+
     <LinearLayout
         android:id="@+id/hsv_path"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_top_title"
+        android:layout_below="@+id/search_input_box"
         android:orientation="horizontal">
 
         <TextView
