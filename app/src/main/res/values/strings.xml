@@ -5,4 +5,5 @@
     <drawable name="recv_buttom_pressed">#272571</drawable>
     <drawable name="send_buttom_default">#FF4081</drawable>
     <drawable name="send_buttom_pressed">#972149</drawable>
+    <string name="title_activity_home">HomeActivity</string>
 </resources>
