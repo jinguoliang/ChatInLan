@@ -3,6 +3,7 @@ package com.xanarry.lantrans.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
@@ -10,6 +11,7 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 /**
