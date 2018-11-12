@@ -154,21 +154,10 @@ public class ReceiveActivity extends AppCompatActivity {
         protected Integer doInBackground(String... params) {
             //-3等待主机, -2发现主机 -1更新列表
             //等待主机被发现
-            udpServer = new UdpServer(Configuration.UDP_PORT, new ProgressListener() {
-                @Override
-                public void updateProgress(int filePositon, long hasGot, long totalSize, int speed) {
-                    int progress = new Double(100.0 * (double) hasGot / (double) totalSize).intValue();
-                    publishProgress(filePositon, progress, speed);
-                }
-            });
+            udpServer = new UdpServer(Configuration.UDP_PORT);
 
-            DatagramPacket senderPacket = udpServer.waitClient();
-            udpServer.close();
-            if (senderPacket == null) {
-                return -1;//超时得到null
-            }
 
-            senderIP = senderPacket.getAddress().getHostName();
+            senderIP = "";
 
             //已经发现主机
             publishProgress(-2, 0, 0);

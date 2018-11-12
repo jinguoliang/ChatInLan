@@ -4,6 +4,10 @@ package com.xanarry.lantrans.utils;
  * Created by xanarry on 2016/5/22.
  */
 public class Configuration {
+
+    public static final String RESPONSE_DATA = "I'm receiver and I'm here";
+    public static final String BROADCAST_DATA = "I'm sender, where is the receiver";
+
     //udp
     public static final int UDP_PORT = 8888;
     public static final int SEARCH_TIMOUT = 2;

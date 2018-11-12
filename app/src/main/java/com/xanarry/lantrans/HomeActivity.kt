@@ -24,7 +24,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         Thread {
-            UdpServer(9992, ProgressListener { filePositon, hasGot, totalSize, speed ->  }).waitClient()
+            UdpServer(9992).waitClient()
         }.start()
     }
 
