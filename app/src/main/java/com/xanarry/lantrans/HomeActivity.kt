@@ -68,7 +68,7 @@ class HomeActivity : AppCompatActivity() {
 
         }
 
-        control.waitScan()
+        control.waiting()
     }
 
     override fun onDestroy() {
