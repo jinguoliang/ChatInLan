@@ -6,4 +6,7 @@
     <drawable name="send_buttom_default">#FF4081</drawable>
     <drawable name="send_buttom_pressed">#972149</drawable>
     <string name="title_activity_home">HomeActivity</string>
+    <string name="send">发送</string>
+    <string name="my_lan_ip">我的局域网 IP：</string>
+    <string name="plus">+</string>
 </resources>
