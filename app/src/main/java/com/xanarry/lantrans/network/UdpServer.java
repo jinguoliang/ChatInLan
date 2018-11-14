@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeoutException;
 
 import static com.xanarry.lantrans.utils.Configuration.BROADCAST_DATA;
 import static com.xanarry.lantrans.utils.Configuration.RESPONSE_DATA;
@@ -18,20 +20,24 @@ public class UdpServer {
 
     private int mPort;
     private DatagramSocket socket;
+    private boolean mLive = true;
 
     public UdpServer(int port) {
         this.mPort = port;
     }
 
-    public void waitClient() {
-        try {
+    public void waitClient() throws IOException {
             socket = new DatagramSocket(mPort);//设置服务器端口, 监听广播信息
 
             byte[] buf = new byte[BROADCAST_DATA.getBytes().length];
             DatagramPacket message = new DatagramPacket(buf, buf.length);
-            while (true) {
+            while (mLive) {
                 message.setData(buf);
-                socket.receive(message);
+                try {
+                    socket.receive(message);
+                } catch (SocketTimeoutException e) {
+
+                }
 
                 String msg = new String(message.getData());
 
@@ -42,12 +48,11 @@ public class UdpServer {
                     Log.e(TAG, "waitClient: send out");
                 }
             }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         socket.close();
+    }
+
+    public void kill() {
+        mLive = false;
     }
 
     public void close() {
