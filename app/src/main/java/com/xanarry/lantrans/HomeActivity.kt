@@ -8,7 +8,9 @@ import com.xanarry.lantrans.minterfaces.SearchStateListener
 import com.xanarry.lantrans.network.UdpClient
 import com.xanarry.lantrans.network.UdpServer
 
+import com.xanarry.lantrans.utils.Utils
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.content_home.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -16,6 +18,8 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         setSupportActionBar(toolbar)
+
+        my_ip.text = Utils.getLocalHostLanIP().hostAddress
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
