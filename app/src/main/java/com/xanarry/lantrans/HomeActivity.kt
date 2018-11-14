@@ -1,9 +1,9 @@
 package com.xanarry.lantrans
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import com.xanarry.lantrans.network.UdpClient
 import com.xanarry.lantrans.network.UdpServer
 import com.xanarry.lantrans.utils.Utils
