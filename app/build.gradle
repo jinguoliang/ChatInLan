@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.xanarry.lantrans"
-        minSdkVersion 15
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -29,4 +29,6 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha01'
     implementation files('libs/glide-3.6.1.jar')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.empty.jinux:baselibrary:1.2.0'
+
 }

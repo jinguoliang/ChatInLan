@@ -22,12 +22,11 @@ class HomeActivity : AppCompatActivity() {
         my_ip.text = Utils.getLocalHostLanIP().hostAddress
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Scaning...", Snackbar.LENGTH_LONG).show()
-            Thread {
-                val address = UdpClient(9992).search()
-                if (address != null) {
-                    runOnUiThread {
-                        Toast.makeText(this@HomeActivity, "receiver = ${address}", Toast.LENGTH_LONG).show()
+            Snackbar.make(view, "Scaning...", com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
+            SearchThread { addresses ->
+                runOnUiThread {
+                    addresses.forEach {
+                        Toast.makeText(this@HomeActivity, "receiver = $it", Toast.LENGTH_LONG).show()
                     }
                 }
             }.start()
@@ -44,6 +43,15 @@ class HomeActivity : AppCompatActivity() {
 
 }
 
+class SearchThread(val callback: (address: List<String>) -> Unit) : Thread() {
+    override fun run() {
+        val address = UdpClient(9992).search()
+        if (address != null) {
+            callback(address)
+        }
+    }
+}
+
 class ThreadControl {
     private val udpServer = UdpServer(9992)
 
@@ -56,6 +64,4 @@ class ThreadControl {
     fun stopWait() {
         udpServer.kill()
     }
-
-
 }
