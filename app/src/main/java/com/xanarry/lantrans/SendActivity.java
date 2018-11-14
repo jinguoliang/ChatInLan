@@ -92,12 +92,7 @@ public class SendActivity extends AppCompatActivity {
                 Utils.showDialog(SendActivity.this, "提示", "首先选择文件是必须的!");
             } else {
                 final SearchReceiverTask searchReceiverTask = new SearchReceiverTask();
-                udpClient = new UdpClient(new SearchStateListener() {
-                    @Override
-                    public void updateState(int tryTimes, int times) {
-                        searchReceiverTask.onProgressUpdate(tryTimes, times);
-                    }
-                });
+                udpClient = new UdpClient();
                 searchReceiverTask.execute();//搜索完成后自动执行发送在post函数中
             }
         }
@@ -167,7 +162,8 @@ public class SendActivity extends AppCompatActivity {
 
         @Override
         protected HostAddress doInBackground(String... params) {
-            return udpClient.search();
+//            return udpClient.search();
+            return null;
         }
 
         @Override

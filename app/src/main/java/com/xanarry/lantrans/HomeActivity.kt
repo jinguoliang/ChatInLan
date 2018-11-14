@@ -2,9 +2,8 @@ package com.xanarry.lantrans
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity;
-import com.xanarry.lantrans.minterfaces.ProgressListener
-import com.xanarry.lantrans.minterfaces.SearchStateListener
+import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import com.xanarry.lantrans.network.UdpClient
 import com.xanarry.lantrans.network.UdpServer
 import com.xanarry.lantrans.utils.Utils
@@ -23,9 +22,16 @@ class HomeActivity : AppCompatActivity() {
         my_ip.text = Utils.getLocalHostLanIP().hostAddress
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-            UdpClient(SearchStateListener { tryTimes, times -> }, 9992).search()
+            Snackbar.make(view, "Scaning...", Snackbar.LENGTH_LONG).show()
+            Thread {
+                val address = UdpClient(9992).search()
+                if (address != null) {
+                    runOnUiThread {
+                        Toast.makeText(this@HomeActivity, "receiver = ${address}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }.start()
+
         }
 
         control.waitScan()

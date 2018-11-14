@@ -1,5 +1,7 @@
 package com.xanarry.lantrans.network;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.xanarry.lantrans.minterfaces.SearchStateListener;
@@ -13,6 +15,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 
 /**
  * Created by xanarry on 2016/5/22.
@@ -24,83 +27,63 @@ public class UdpClient {
     private int port;
     private String TAG;
 
-    public UdpClient(SearchStateListener updateState, int timeout, int times, int port) {
-        this.updateState = updateState;
+    public UdpClient(int timeout, int times, int port) {
         this.timeout = timeout;
         this.times = times;
         this.port = port;
         TAG = UdpClient.class.getName();
     }
 
-    public UdpClient(SearchStateListener updateState, int port) {
-        this.updateState = updateState;
+    public UdpClient(int port) {
         this.timeout = Configuration.SEARCH_TIMOUT;
         this.times = Configuration.SEARCH_TIMES;
         this.port = port;
         TAG = UdpClient.class.getName();
     }
 
-    public UdpClient(SearchStateListener updateState) {
-        this.updateState = updateState;
+    public UdpClient() {
         this.timeout = Configuration.SEARCH_TIMOUT;
         this.times = Configuration.SEARCH_TIMES;
         this.port = Configuration.UDP_PORT;
         TAG = UdpClient.class.getName();
     }
 
-    public HostAddress search() {
-        DatagramPacket sendPacket = null;
-        DatagramPacket recvPacket = null;
-        DatagramSocket clientSocket = null;
-        InetAddress address = null;
-        DatagramPacket packet;
-        String msg = "Lantrans Android UDPCLIENT" + Configuration.DELIMITER;
+    public @Nullable
+    InetAddress search() {
+        byte[] recvBuf = new byte[Configuration.RESPONSE_DATA.getBytes().length];
+        byte[] sendBuf = Configuration.BROADCAST_DATA.getBytes();
 
-        byte[] recvBuf = new byte[Configuration.STRING_BUF_LEN];
-        byte[] sendBuf = new byte[Configuration.STRING_BUF_LEN];
-        address = Utils.getBroadcastAddr();//设置广播地址
+        InetAddress address = Utils.getBroadcastAddr();//设置广播地址
+        DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, address, port);
+        DatagramPacket recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
+
 
         try {
-            clientSocket = new DatagramSocket();//创建一个udpClient
+            DatagramSocket clientSocket = new DatagramSocket();//创建一个udpClient
             clientSocket.setBroadcast(true);//广播信息
             clientSocket.setSoTimeout(this.timeout * 1000);//如果2秒后没后得到服务器的回应, 抛出超时异常, 以便重新广播
+
             Log.e(TAG, "本机ip:" + Utils.getLocalHostLanIP() + " 广播地址:" + address);
-            sendBuf = msg.getBytes("utf-8");
+
+            clientSocket.send(sendPacket);//向服务器发送数据包
+            clientSocket.receive(recvPacket);
+            clientSocket.close();
+
+            Log.e(TAG, "search: receive " + recvPacket.getAddress());
+            String msg = new String(recvPacket.getData());
+            Log.e(TAG, "search: receive " + msg);
+            if (Configuration.RESPONSE_DATA.equals(msg)) {
+                Log.e(TAG, "search: match");
+                return recvPacket.getAddress();
+            }
         } catch (SocketException e3) {
             e3.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        sendPacket = new DatagramPacket(sendBuf, sendBuf.length, address, port);
-        recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
-
-        int tryTimes = 1;
-        while (tryTimes <= times) {//多次尝试
-            try {
-                clientSocket.send(sendPacket);//向服务器发送数据包
-                clientSocket.receive(recvPacket);//如果没有收到数据包, 那么尝试多次
-                if (recvPacket != null && new String(recvPacket.getData()).length() > 0) {
-                    break;
-                }
-            } catch (SocketTimeoutException e) {
-                e.printStackTrace();
-                updateState.updateState(tryTimes, times);
-                Log.e(TAG, "超时: " + tryTimes + "次" + "共:" + times + "次");
-                tryTimes++;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (tryTimes <= times) {
-            String strPort = Utils.getMessage(recvPacket.getData());
-            if (strPort != null && strPort.length() > 0) {
-                int serverPort = Integer.parseInt(strPort);
-                Log.e(TAG, new HostAddress(recvPacket.getAddress(), serverPort).toString());
-                return new HostAddress(recvPacket.getAddress(), serverPort);
-            }
-        }
         return null;
     }
 }
