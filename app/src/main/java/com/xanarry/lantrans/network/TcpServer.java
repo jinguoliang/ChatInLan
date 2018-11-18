@@ -50,10 +50,9 @@ public class TcpServer {
 
         try {
             serverSocket = new ServerSocket(this.port);//创建tcp服务器, 接收文件
-            serverSocket.setSoTimeout(Configuration.WAITING_TIME * 1000);//设置等待连接时长
             Log.e(TAG, "tcp server is waiting");
             channel = serverSocket.accept();//建立链接
-            channel.setKeepAlive(Boolean.TRUE);
+            channel.setKeepAlive(true);
 
             //获取socket的输入输出流
             bufferedInputStream = new BufferedInputStream(channel.getInputStream());
@@ -171,5 +170,9 @@ public class TcpServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void waitClient() {
+        waitSenderConnect();
     }
 }

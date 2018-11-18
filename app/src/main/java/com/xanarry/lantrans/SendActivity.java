@@ -14,7 +14,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.xanarry.lantrans.minterfaces.ProgressListener;
-import com.xanarry.lantrans.minterfaces.SearchStateListener;
 import com.xanarry.lantrans.network.HostAddress;
 import com.xanarry.lantrans.network.TcpClient;
 import com.xanarry.lantrans.network.UdpClient;
@@ -86,7 +85,7 @@ public class SendActivity extends AppCompatActivity {
         public void onClick(View v) {
             if (isSending == true) {
                 Utils.showDialog(SendActivity.this, "提示", "您当前的发送任务正在进行中");
-            } else if (Utils.getBroadcastAddr() == null) {
+            } else if (Utils.getBroadcastAddress() == null) {
                 Utils.showDialog(SendActivity.this, "提示", "您没有处于局域网环境中, 抱歉暂时无法使用!");
             } else if (files.size() == 0) {
                 Utils.showDialog(SendActivity.this, "提示", "首先选择文件是必须的!");

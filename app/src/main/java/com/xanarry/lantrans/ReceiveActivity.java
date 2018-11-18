@@ -21,8 +21,6 @@ import com.xanarry.lantrans.utils.ItemsListAdapter;
 import com.xanarry.lantrans.utils.Utils;
 import com.xanarry.lantrans.utils.ViewHolder;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -55,7 +53,7 @@ public class ReceiveActivity extends AppCompatActivity {
         startRecvBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Utils.getBroadcastAddr() == null) {
+                if (Utils.getBroadcastAddress() == null) {
                     Utils.showDialog(ReceiveActivity.this, "提示", "您没有处于局域网环境中, 抱歉暂时无法使用!");
                     return;
                 }

@@ -5,13 +5,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.empty.jinux.baselibaray.log.loge
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.google.android.material.snackbar.Snackbar
-import com.xanarry.lantrans.network.UdpClient
-import com.xanarry.lantrans.network.UdpServer
+import com.xanarry.lantrans.minterfaces.ProgressListener
+import com.xanarry.lantrans.network.*
 import com.xanarry.lantrans.utils.Utils
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
+import java.io.IOException
 
 class HomeActivity : AppCompatActivity() {
 
@@ -28,7 +30,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        my_ip.text = Utils.getLocalHostLanIP().hostAddress
+        my_ip.text = IPUtils.getIPInLan()?.hostAddress
         setupChatList()
         setupInput()
         setupFab()
@@ -43,13 +45,15 @@ class HomeActivity : AppCompatActivity() {
 
     private fun sendTextContent(content: String) {
         mAddress?.let {
-            ChatClient().send(it)
+            val client = TcpClient(HostAddress(it, TRANSFER_WAITER_PORT), ProgressListener { filePositon, hasGot, totalSize, speed ->  })
+            client.connectReceiver("hello")
+
         }
     }
 
     private fun setupChatList() {
         chatRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        chatRecyclerView.withItems {  }
+        chatRecyclerView.withItems { }
     }
 
     private var mAddress: String? = null
@@ -80,19 +84,27 @@ class HomeActivity : AppCompatActivity() {
 
 class SearchThread(val callback: (address: List<String>) -> Unit) : Thread() {
     override fun run() {
-        val address = UdpClient(9992).search()
+        val address = UdpClient(SCAN_WAITER_PORT).search()
         if (address != null) {
             callback(address)
         }
     }
 }
 
-class ThreadControl {
-    private val udpServer = UdpServer(9992)
+const val SCAN_WAITER_PORT = 9992
+const val TRANSFER_WAITER_PORT = 23732
 
+class ThreadControl {
+    private val udpServer = UdpServer(SCAN_WAITER_PORT)
+//    private val tcpServer = TcpServer(TRANSFER_WAITER_PORT, ProgressListener { filePositon, hasGot, totalSize, speed -> })
     fun waiting() {
         Thread {
-            udpServer.waitClient()
+            try {
+                udpServer.waitClient()
+            } catch (e: IOException) {
+                loge("udp server exception")
+            }
+//            tcpServer.waitClient()
         }.start()
     }
 

@@ -3,7 +3,7 @@ package com.xanarry.lantrans.network;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
-import com.xanarry.lantrans.minterfaces.SearchStateListener;
+import com.xanarry.lantrans.IPUtils;
 import com.xanarry.lantrans.utils.Configuration;
 import com.xanarry.lantrans.utils.Utils;
 
@@ -47,7 +47,8 @@ public class UdpClient {
         byte[] recvBuf = new byte[Configuration.RESPONSE_DATA.getBytes().length];
         byte[] sendBuf = Configuration.BROADCAST_DATA.getBytes();
 
-        InetAddress broadcastAddress = Utils.getBroadcastAddr();//设置广播地址
+        InetAddress broadcastAddress = IPUtils.Companion.getBroadcastAddress();
+        Log.e(TAG, "search: " + broadcastAddress );
         DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, broadcastAddress, port);
         DatagramPacket recvPacket = new DatagramPacket(recvBuf, recvBuf.length);
 

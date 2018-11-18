@@ -3,7 +3,6 @@ package com.xanarry.lantrans.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
@@ -11,8 +10,8 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 /**
  * Created by xanarry on 2016/5/24.
@@ -44,57 +43,58 @@ public class Utils {
         return (int) (dsize * 100) / 100.0 + units[pos];
     }
 
-    public static InetAddress getLocalHostLanIP() {
-        //获取本机在局域网中的IP
-        Enumeration<?> allNetInterfaces;
-        InetAddress IP = null;
+    /**
+     * 获取本机在局域网中的IP
+     *
+     * @return
+     */
+    public static InetAddress getIPInLan() {
+        InetAddress result = null;
         try {
-            allNetInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (allNetInterfaces.hasMoreElements()) {
-                NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
-                //System.out.println(netInterface.getName());
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface netInterface = interfaces.nextElement();
+
                 if (netInterface.isLoopback() || netInterface.isPointToPoint()) {
                     continue;
                 }
 
-                Enumeration<?> addresses = netInterface.getInetAddresses();
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
-                    InetAddress tempIP = (InetAddress) addresses.nextElement();
-                    if (tempIP != null && tempIP instanceof Inet4Address) {
-                        //System.out.println("本机的IP=" + tempIP.getHostAddress());
-                        IP = tempIP;
+                    InetAddress address = addresses.nextElement();
+
+                    if (address instanceof Inet4Address) {
+                        result = address;
                     }
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return IP;
+        return result;
     }
 
-    public static InetAddress getBroadcastAddr(InetAddress address) {
-        //获取本机在局域网中的广播地址
+    public static InetAddress getBroadcastAddress(InetAddress address) {
         if (address == null) {
             return null;
         }
-        InetAddress broadcastAddr = null;
-        NetworkInterface networkInterface;
+
+        InetAddress broadcastAddress = null;
         try {
-            networkInterface = NetworkInterface.getByInetAddress(address);
-            for (InterfaceAddress taddr : networkInterface.getInterfaceAddresses()) {
-                //获取指定ip的广播地址
-                if (taddr.getAddress().getHostAddress().equals(address.getHostAddress())) {
-                    broadcastAddr = taddr.getBroadcast();
+            NetworkInterface networkInterface = NetworkInterface.getByInetAddress(address);
+            for (InterfaceAddress a : networkInterface.getInterfaceAddresses()) {
+                if (a.getAddress().getHostAddress().equals(address.getHostAddress())) {
+                    broadcastAddress = a.getBroadcast();
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return broadcastAddr;
+        return broadcastAddress;
     }
 
-    public static InetAddress getBroadcastAddr() {
-        return getBroadcastAddr(getLocalHostLanIP());
+    public static InetAddress getBroadcastAddress() {
+        return getBroadcastAddress(getIPInLan());
     }
 
     public static void showDialog(Activity activity, String title, String message) {
