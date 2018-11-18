@@ -7,6 +7,8 @@ import com.xanarry.lantrans.utils.Configuration;
 import com.xanarry.lantrans.utils.FileDesc;
 import com.xanarry.lantrans.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -27,7 +29,7 @@ public class TcpServer {
     private int port;
     private String TAG;
     private ServerSocket serverSocket;
-    private Socket channel;
+    private Socket clientSocket;
     private BufferedInputStream bufferedInputStream;
     private BufferedOutputStream bufferedOutputStream;
 
@@ -51,12 +53,12 @@ public class TcpServer {
         try {
             serverSocket = new ServerSocket(this.port);//创建tcp服务器, 接收文件
             Log.e(TAG, "tcp server is waiting");
-            channel = serverSocket.accept();//建立链接
-            channel.setKeepAlive(true);
+            clientSocket = serverSocket.accept();//建立链接
+            clientSocket.setKeepAlive(true);
 
             //获取socket的输入输出流
-            bufferedInputStream = new BufferedInputStream(channel.getInputStream());
-            bufferedOutputStream = new BufferedOutputStream(channel.getOutputStream());
+            bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
+            bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
 
             bufferedInputStream.read(inputBuf);//读取要接收文件的描述信息<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             fileInfo = Utils.getMessage(inputBuf);
@@ -166,13 +168,44 @@ public class TcpServer {
             bufferedInputStream.close();
             bufferedOutputStream.close();
             serverSocket.close();
-            channel.close();
+            clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void waitClient() {
-        waitSenderConnect();
+        try {
+            serverSocket = new ServerSocket(this.port);
+            Log.e(TAG, "tcp server is accept");
+            clientSocket = serverSocket.accept();//建立链接
+            Log.e(TAG, "tcp server is accepted");
+            clientSocket.setKeepAlive(true);
+
+            bufferedInputStream = new BufferedInputStream(clientSocket.getInputStream());
+            Log.e(TAG, "input stream opened");
+            bufferedOutputStream = new BufferedOutputStream(clientSocket.getOutputStream());
+            Log.e(TAG, "write stream opened");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @NotNull
+    public String receiveMessage() {
+        if (bufferedInputStream == null) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        byte[] buffer = new byte[1024];
+        try {
+            int n = bufferedInputStream.read(buffer);
+            builder.append(new String(buffer, 0, n));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return builder.toString();
     }
 }

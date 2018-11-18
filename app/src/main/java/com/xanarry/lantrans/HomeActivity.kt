@@ -10,12 +10,14 @@ import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.google.android.material.snackbar.Snackbar
 import com.xanarry.lantrans.minterfaces.ProgressListener
 import com.xanarry.lantrans.network.*
-import com.xanarry.lantrans.utils.Utils
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
+import org.jetbrains.anko.doAsync
 import java.io.IOException
 
 class HomeActivity : AppCompatActivity() {
+
+    private var client: TcpClient? = null
 
     val control = ThreadControl()
 
@@ -45,8 +47,13 @@ class HomeActivity : AppCompatActivity() {
 
     private fun sendTextContent(content: String) {
         mAddress?.let {
-            val client = TcpClient(HostAddress(it, TRANSFER_WAITER_PORT), ProgressListener { filePositon, hasGot, totalSize, speed ->  })
-            client.connectReceiver("hello")
+            doAsync {
+                if (client == null) {
+                    client = TcpClient(HostAddress(it, TRANSFER_WAITER_PORT), ProgressListener { filePositon, hasGot, totalSize, speed -> })
+                    client?.connectReceiver()
+                }
+                client?.send("hello")
+            }
 
         }
     }
@@ -96,7 +103,7 @@ const val TRANSFER_WAITER_PORT = 23732
 
 class ThreadControl {
     private val udpServer = UdpServer(SCAN_WAITER_PORT)
-//    private val tcpServer = TcpServer(TRANSFER_WAITER_PORT, ProgressListener { filePositon, hasGot, totalSize, speed -> })
+    private val tcpServer = TcpServer(TRANSFER_WAITER_PORT, ProgressListener { filePositon, hasGot, totalSize, speed -> })
     fun waiting() {
         Thread {
             try {
@@ -104,7 +111,9 @@ class ThreadControl {
             } catch (e: IOException) {
                 loge("udp server exception")
             }
-//            tcpServer.waitClient()
+            tcpServer.waitClient()
+            val msg = tcpServer.receiveMessage()
+            loge("msg = $msg")
         }.start()
     }
 
