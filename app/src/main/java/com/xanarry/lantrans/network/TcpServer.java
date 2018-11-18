@@ -178,7 +178,7 @@ public class TcpServer {
         try {
             serverSocket = new ServerSocket(this.port);
             Log.e(TAG, "tcp server is accept");
-            clientSocket = serverSocket.accept();//建立链接
+            clientSocket = serverSocket.accept();
             Log.e(TAG, "tcp server is accepted");
             clientSocket.setKeepAlive(true);
 
@@ -207,5 +207,27 @@ public class TcpServer {
             e.printStackTrace();
         }
         return builder.toString();
+    }
+
+    public void receiveFile() {
+        if (bufferedInputStream == null) {
+            return;
+        }
+
+        byte[] buffer = new byte[1024];
+        try {
+            BufferedInputStream in = bufferedInputStream;
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream("/sdcard/hellosss"));
+            int n = in.read(buffer);
+            while (n > 0) {
+                Log.e(TAG, "receiveFile: " + n);
+                out.write(buffer, 0, n);
+                out.flush();
+                n = bufferedInputStream.read(buffer);
+            }
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

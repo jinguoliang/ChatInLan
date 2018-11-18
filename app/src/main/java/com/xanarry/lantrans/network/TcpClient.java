@@ -166,4 +166,29 @@ public class TcpClient {
 
         }
     }
+
+    public void sendFile(String path) {
+        if (bufferedOutputStream == null) {
+            return;
+        }
+
+        try {
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
+            BufferedOutputStream out = bufferedOutputStream;
+
+            byte[] buf = new byte[1024];
+            int n = in.read(buf);
+            while (n > 0) {
+                Log.e(TAG, "sendFile: " + n);
+                out.write(buf, 0, n);
+                out.flush();
+                n = in.read(buf);
+            }
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

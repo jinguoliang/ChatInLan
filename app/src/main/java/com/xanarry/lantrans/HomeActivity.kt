@@ -53,6 +53,7 @@ class HomeActivity : AppCompatActivity() {
                     client?.connectReceiver()
                 }
                 client?.send("hello")
+                client?.sendFile("/sdcard/zhao.mp3")
             }
 
         }
@@ -114,6 +115,7 @@ class ThreadControl {
             tcpServer.waitClient()
             val msg = tcpServer.receiveMessage()
             loge("msg = $msg")
+            tcpServer.receiveFile()
         }.start()
     }
 
