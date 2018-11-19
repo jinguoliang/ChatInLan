@@ -1,4 +1,4 @@
-package com.xanarry.lantrans.network
+package com.jone.lanchat.network
 
 /**
  */

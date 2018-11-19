@@ -1,8 +1,8 @@
-package com.xanarry.lantrans.network
+package com.jone.lanchat.network
 
 import android.util.Log
-import com.xanarry.lantrans.utils.Configuration.BROADCAST_DATA
-import com.xanarry.lantrans.utils.Configuration.RESPONSE_DATA
+import com.jone.lanchat.utils.Configuration.BROADCAST_DATA
+import com.jone.lanchat.utils.Configuration.RESPONSE_DATA
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket

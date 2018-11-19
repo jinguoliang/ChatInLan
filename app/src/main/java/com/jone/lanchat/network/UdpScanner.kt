@@ -1,8 +1,8 @@
-package com.xanarry.lantrans.network
+package com.jone.lanchat.network
 
 import android.util.Log
-import com.xanarry.lantrans.IPUtils
-import com.xanarry.lantrans.utils.Configuration
+import com.jone.lanchat.IPUtils
+import com.jone.lanchat.utils.Configuration
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.net.DatagramPacket
@@ -13,29 +13,24 @@ import java.util.*
 /**
  */
 class UdpClient(private val port: Int) {
-    private val timeout: Int = Configuration.SEARCH_TIMOUT
-
     fun search(): List<String>? {
         val receiveBuf = ByteArray(Configuration.RESPONSE_DATA.toByteArray().size)
         val sendBuf = Configuration.BROADCAST_DATA.toByteArray()
 
         val broadcastAddress = IPUtils.getBroadcastAddress()
-        Log.e(TAG, "search: " + broadcastAddress!!)
         val sendPacket = DatagramPacket(sendBuf, sendBuf.size, broadcastAddress, port)
         val receivePacket = DatagramPacket(receiveBuf, receiveBuf.size)
 
         val addresses = ArrayList<String>()
-
-
         try {
-            val clientSocket = DatagramSocket()//创建一个udpClient
-            clientSocket.broadcast = true//广播信息
-            clientSocket.soTimeout = this.timeout * 1000//如果2秒后没后得到服务器的回应, 抛出超时异常, 以便重新广播
+            val clientSocket = DatagramSocket()
+            clientSocket.broadcast = true
+            clientSocket.soTimeout = Configuration.SEARCH_SOCKET_TIMEOUT
 
-            clientSocket.send(sendPacket)//向服务器发送数据包
+            clientSocket.send(sendPacket)
 
             val startTime = System.currentTimeMillis()
-            while (System.currentTimeMillis() - startTime < 10000) {
+            while (System.currentTimeMillis() - startTime < Configuration.SEARCH_TIMEOUT) {
                 clientSocket.receive(receivePacket)
                 Log.e(TAG, "search: receive " + receivePacket.address)
                 val msg = String(receivePacket.data)

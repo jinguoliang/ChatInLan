@@ -1,4 +1,4 @@
-package com.xanarry.lantrans;
+package com.jone.lanchat;
 
 import android.app.Activity;
 import android.content.Context;

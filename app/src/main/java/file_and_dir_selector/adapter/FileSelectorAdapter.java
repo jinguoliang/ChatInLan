@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.xanarry.lantrans.FileSelectorActivity;
-import com.xanarry.lantrans.R;
+import com.jone.lanchat.FileSelectorActivity;
+import com.jone.lanchat.R;
 
 import java.util.ArrayList;
 import java.util.List;

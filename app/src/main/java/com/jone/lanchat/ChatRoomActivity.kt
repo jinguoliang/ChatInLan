@@ -1,4 +1,4 @@
-package com.xanarry.lantrans
+package com.jone.lanchat
 
 import android.os.Bundle
 import android.widget.Toast
@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.empty.jinux.baselibaray.log.loge
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.google.android.material.snackbar.Snackbar
-import com.xanarry.lantrans.minterfaces.ProgressListener
-import com.xanarry.lantrans.network.*
+import com.jone.lanchat.network.*
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import org.jetbrains.anko.doAsync

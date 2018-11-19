@@ -1,4 +1,4 @@
-package com.xanarry.lantrans;
+package com.jone.lanchat;
 
 import org.junit.Test;
 

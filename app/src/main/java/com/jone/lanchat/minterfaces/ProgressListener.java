@@ -1,4 +1,4 @@
-package com.xanarry.lantrans.minterfaces;
+package com.jone.lanchat.minterfaces;
 
 /**
  * Created by xanarry on 2016/5/23.

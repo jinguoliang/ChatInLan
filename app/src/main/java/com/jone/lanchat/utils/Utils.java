@@ -1,4 +1,4 @@
-package com.xanarry.lantrans.utils;
+package com.jone.lanchat.utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,7 +11,6 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.Iterator;
 
 /**
  * Created by xanarry on 2016/5/24.

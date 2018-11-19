@@ -1,7 +1,6 @@
-package com.xanarry.lantrans.utils;
+package com.jone.lanchat.utils;
 
 /**
- * Created by xanarry on 2016/5/22.
  */
 public class Configuration {
 
@@ -10,7 +9,7 @@ public class Configuration {
 
     //udp
     public static final int UDP_PORT = 8888;
-    public static final int SEARCH_TIMOUT = 2;
+    public static final int SEARCH_TIMEOUT = 2;
     public static final int SEARCH_TIMES = 5;
 
     //tcp

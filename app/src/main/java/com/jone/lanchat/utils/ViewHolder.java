@@ -1,4 +1,4 @@
-package com.xanarry.lantrans.utils;
+package com.jone.lanchat.utils;
 
 import android.widget.ProgressBar;
 import android.widget.TextView;
