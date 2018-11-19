@@ -1,7 +1,6 @@
 package com.jone.lanchat.network
 
 import android.util.Log
-import com.jone.lanchat.IPUtils
 import com.jone.lanchat.utils.Configuration
 import com.jone.lanchat.utils.runUntil
 import java.io.UnsupportedEncodingException

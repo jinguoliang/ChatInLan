@@ -1,4 +1,4 @@
-package com.jone.lanchat
+package com.jone.lanchat.network
 
 import java.net.Inet4Address
 import java.net.InetAddress
