@@ -91,7 +91,7 @@ class HomeActivity : AppCompatActivity() {
 
 class SearchThread(val callback: (address: List<String>) -> Unit) : Thread() {
     override fun run() {
-        val address = UdpClient(SCAN_WAITER_PORT).search()
+        val address = UdpScanner(SCAN_WAITER_PORT).search()
         if (address != null) {
             callback(address)
         }
