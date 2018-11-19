@@ -12,8 +12,9 @@ import java.util.*
 
 /**
  */
-class UdpScanner(private val port: Int) {
-    fun search(): List<String> {
+class UdpScanner(private val port: Int) : Scanner {
+
+    override fun scan(): List<String> {
         try {
             val clientSocket = broadcast(Configuration.BROADCAST_DATA)
             val addresses = waitResponse(clientSocket, Configuration.RESPONSE_DATA)
