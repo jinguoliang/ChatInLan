@@ -49,7 +49,7 @@ class HomeActivity : AppCompatActivity() {
         mAddress?.let {
             doAsync {
                 if (client == null) {
-                    client = TcpClient(HostAddress(it, TRANSFER_WAITER_PORT), ProgressListener { filePositon, hasGot, totalSize, speed -> })
+                    client = TcpClient(it, TRANSFER_WAITER_PORT)
                     client?.connectReceiver()
                 }
                 client?.send("hello")
@@ -104,7 +104,7 @@ const val TRANSFER_WAITER_PORT = 23732
 
 class ThreadControl {
     private val udpServer = UdpServer(SCAN_WAITER_PORT)
-    private val tcpServer = TcpServer(TRANSFER_WAITER_PORT, ProgressListener { filePositon, hasGot, totalSize, speed -> })
+    private val tcpServer = TcpServer(TRANSFER_WAITER_PORT)
     fun waiting() {
         Thread {
             try {
