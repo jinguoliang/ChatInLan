@@ -9,6 +9,7 @@ import com.empty.jinux.baselibaray.log.loge
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.google.android.material.snackbar.Snackbar
 import com.jone.lanchat.network.*
+import com.jone.lanchat.utils.showToast
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import org.jetbrains.anko.doAsync
@@ -73,7 +74,11 @@ class HomeActivity : AppCompatActivity() {
                     addresses.forEach {
                         Toast.makeText(this@HomeActivity, "receiver = $it", Toast.LENGTH_LONG).show()
                     }
-                    mAddress = addresses[0]
+                    if (addresses.isEmpty()) {
+                        showToast(R.string.no_target)
+                    } else {
+                        mAddress = addresses[0]
+                    }
                 }
             }.start()
 
@@ -91,10 +96,8 @@ class HomeActivity : AppCompatActivity() {
 
 class SearchThread(val callback: (address: List<String>) -> Unit) : Thread() {
     override fun run() {
-        val address = UdpScanner(SCAN_WAITER_PORT).search()
-        if (address != null) {
-            callback(address)
-        }
+        val addresses = UdpScanner(SCAN_WAITER_PORT).scan()
+        callback(addresses)
     }
 }
 
