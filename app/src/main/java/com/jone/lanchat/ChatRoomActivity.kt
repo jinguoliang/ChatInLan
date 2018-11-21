@@ -10,6 +10,9 @@ import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.google.android.material.snackbar.Snackbar
 import com.jone.lanchat.network.*
 import com.jone.lanchat.utils.showToast
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import org.jetbrains.anko.doAsync
@@ -20,6 +23,8 @@ class HomeActivity : AppCompatActivity() {
     private var client: TcpClient? = null
 
     val control = ThreadControl()
+
+    val presenter = ChatRoomPresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,10 +37,14 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        my_ip.text = IPUtils.getIPInLan()?.hostAddress
+        showMyIPInLan()
         setupChatList()
         setupInput()
         setupFab()
+    }
+
+    private fun showMyIPInLan() {
+        my_ip.text = IPUtils.getIPInLan()?.hostAddress
     }
 
     private fun setupInput() {
@@ -69,22 +78,33 @@ class HomeActivity : AppCompatActivity() {
     private fun setupFab() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Scaning...", com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
-            SearchThread { addresses ->
-                runOnUiThread {
-                    addresses.forEach {
-                        Toast.makeText(this@HomeActivity, "receiver = $it", Toast.LENGTH_LONG).show()
+            scanObservable()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { addresses ->
+                        showOtherPoint(addresses)
                     }
-                    if (addresses.isEmpty()) {
-                        showToast(R.string.no_target)
-                    } else {
-                        mAddress = addresses[0]
-                    }
-                }
-            }.start()
-
         }
 
         control.waiting()
+    }
+
+    private fun scanObservable(): Observable<List<String>> {
+        return Observable.create<List<String>> {
+            val addresses = UdpScanner(SCAN_WAITER_PORT).scan()
+            it.onNext(addresses)
+        }
+    }
+
+    private fun showOtherPoint(addresses: List<String>) {
+        addresses.forEach {
+            Toast.makeText(this@HomeActivity, "receiver = $it", Toast.LENGTH_LONG).show()
+        }
+        if (addresses.isEmpty()) {
+            showToast(R.string.no_target)
+        } else {
+            mAddress = addresses[0]
+        }
     }
 
     override fun onDestroy() {
@@ -92,13 +112,6 @@ class HomeActivity : AppCompatActivity() {
         control.stopWait()
     }
 
-}
-
-class SearchThread(val callback: (address: List<String>) -> Unit) : Thread() {
-    override fun run() {
-        val addresses = UdpScanner(SCAN_WAITER_PORT).scan()
-        callback(addresses)
-    }
 }
 
 const val SCAN_WAITER_PORT = 9992
