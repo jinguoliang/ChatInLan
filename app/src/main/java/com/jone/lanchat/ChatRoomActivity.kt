@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.content_home.*
 import org.jetbrains.anko.doAsync
 import java.io.IOException
 
-class HomeActivity : AppCompatActivity() {
+class ChatRoomActivity : AppCompatActivity() {
 
     private var client: TcpClient? = null
 
@@ -98,7 +98,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun showOtherPoint(addresses: List<String>) {
         addresses.forEach {
-            Toast.makeText(this@HomeActivity, "receiver = $it", Toast.LENGTH_LONG).show()
+            Toast.makeText(this@ChatRoomActivity, "receiver = $it", Toast.LENGTH_LONG).show()
         }
         if (addresses.isEmpty()) {
             showToast(R.string.no_target)
