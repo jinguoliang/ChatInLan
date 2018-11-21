@@ -14,7 +14,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.io.IOException
 
-class ChatRoomPresenter {
+class ChatRoomPresenter(val view: ChatRoomActivity) {
 
     private var client: TcpClient? = null
 
@@ -68,7 +68,9 @@ class ChatRoomPresenter {
                 .subscribe()
         transitionWaiterDisposable = TransitionWaiterObservable().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
+                .subscribe {
+                    view.showMessage(it)
+                }
     }
 
     fun onActivityDestroy() {
@@ -102,18 +104,24 @@ class WaiterObservable : Observable<Void>() {
     }
 }
 
-class TransitionWaiterObservable : Observable<Void>() {
+class TransitionWaiterObservable : Observable<String>() {
     private val tcpServer = TcpServer(TRANSFER_WAITER_PORT)
 
-    override fun subscribeActual(observer: Observer<in Void>?) {
+    private var isLive: Boolean = true
+
+    override fun subscribeActual(observer: Observer<in String>?) {
         observer?.onSubscribe(D())
         tcpServer.waitClient()
-        val msg = tcpServer.receiveMessage()
-        logi("msg = $msg")
+        while (isLive) {
+            val msg = tcpServer.receiveMessage()
+            logi("msg = $msg")
+            observer?.onNext(msg)
+        }
     }
 
     inner class D : MainThreadDisposable() {
         override fun onDispose() {
+            isLive = false
             tcpServer.close()
         }
     }

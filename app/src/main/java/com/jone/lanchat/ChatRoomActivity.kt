@@ -5,20 +5,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.empty.jinux.baselibaray.log.loge
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.jone.lanchat.network.IPUtils
-import com.jone.lanchat.network.TcpClient
-import com.jone.lanchat.network.TcpServer
-import com.jone.lanchat.network.UdpServer
 import com.jone.lanchat.utils.showToast
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
-import java.io.IOException
 
 class ChatRoomActivity : AppCompatActivity() {
 
-    private val presenter = ChatRoomPresenter()
+    private val presenter = ChatRoomPresenter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +54,12 @@ class ChatRoomActivity : AppCompatActivity() {
             presenter.getOtherPoint { addresses ->
                 showOtherPoint(addresses)
             }
+        }
+    }
+
+    fun showMessage(message: String?) {
+        message?.apply {
+            showToast(this)
         }
     }
 
