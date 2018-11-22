@@ -52,6 +52,9 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
 
     fun onActivityCreate() {
         startWaiting()
+        getOtherPoint { addresses ->
+            view.showOtherPoint(addresses)
+        }
     }
 
     private var waiterDisposable: Disposable? = null
