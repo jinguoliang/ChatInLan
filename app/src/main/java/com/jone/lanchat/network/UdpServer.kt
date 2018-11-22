@@ -18,15 +18,16 @@ class UdpServer(private val mPort: Int) {
     @Throws(IOException::class)
     fun waitClient() {
         socket = DatagramSocket(mPort)
-
+        socket!!.soTimeout = 5000
         val buf = ByteArray(BROADCAST_DATA.toByteArray().size)
         val message = DatagramPacket(buf, buf.size)
         while (mLive) {
             message.data = buf
+            Log.e(TAG, "receiving...")
             try {
                 socket!!.receive(message)
             } catch (e: SocketTimeoutException) {
-
+                continue
             }
 
             val msg = String(message.data)

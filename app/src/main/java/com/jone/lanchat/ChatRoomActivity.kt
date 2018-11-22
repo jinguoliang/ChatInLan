@@ -3,15 +3,18 @@ package com.jone.lanchat
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.jone.lanchat.network.IPUtils
 import com.jone.lanchat.utils.showToast
+import com.trello.rxlifecycle3.components.RxActivity
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 
-class ChatRoomActivity : AppCompatActivity() {
+class ChatRoomActivity : RxAppCompatActivity() {
 
     private val presenter = ChatRoomPresenter(this)
 

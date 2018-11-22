@@ -1,18 +1,11 @@
 package com.jone.lanchat
 
-import com.empty.jinux.baselibaray.log.loge
-import com.empty.jinux.baselibaray.log.logi
 import com.jone.lanchat.network.TcpClient
-import com.jone.lanchat.network.TcpServer
 import com.jone.lanchat.network.UdpScanner
-import com.jone.lanchat.network.UdpServer
+import com.jone.lanchat.utils.ioToUI
+import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindToLifecycle
 import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.MainThreadDisposable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import java.io.IOException
 
 class ChatRoomPresenter(val view: ChatRoomActivity) {
 
@@ -31,8 +24,8 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
 
     fun getOtherPoint(callback: (addresses: List<String>) -> Unit) {
         scanDisposable = scanObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .ioToUI()
+                .bindToLifecycle(view)
                 .subscribe { addresses ->
                     callback(addresses)
                     address = addresses[0]
@@ -41,16 +34,19 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
 
     internal fun sendTextContent(content: String) {
         address?.let {
-            Observable.create<Void> { _ ->
-                if (client == null) {
-                    client = TcpClient(it, TRANSFER_WAITER_PORT)
-                    client?.connectReceiver()
-                }
-                client?.send(content)
-            }.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+            createTransferClientObserver(it, content)
+                    .ioToUI()
                     .subscribe()
+        }
+    }
 
+    private fun createTransferClientObserver(it: String, content: String): Observable<Void> {
+        return Observable.create<Void> { _ ->
+            if (client == null) {
+                client = TcpClient(it, TRANSFER_WAITER_PORT)
+                client?.connectReceiver()
+            }
+            client?.send(content)
         }
     }
 
@@ -63,67 +59,23 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
     private var transitionWaiterDisposable: Disposable? = null
 
     private fun startWaiting() {
-        waiterDisposable = WaiterObservable().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        waiterDisposable = WaiterObservable()
+                .ioToUI()
+                .bindToLifecycle(view)
                 .subscribe()
-        transitionWaiterDisposable = TransitionWaiterObservable().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        transitionWaiterDisposable = TransitionWaiterObservable()
+                .ioToUI()
+                .bindToLifecycle(view)
                 .subscribe {
                     view.showMessage(it)
                 }
     }
 
     fun onActivityDestroy() {
-        scanDisposable?.dispose()
-        waiterDisposable?.dispose()
         client?.close()
-        transitionWaiterDisposable?.dispose()
     }
 }
 
 const val SCAN_WAITER_PORT = 9992
 const val TRANSFER_WAITER_PORT = 23732
-
-class WaiterObservable : Observable<Void>() {
-    private val udpServer = UdpServer(SCAN_WAITER_PORT)
-
-    override fun subscribeActual(observer: Observer<in Void>?) {
-        observer?.onSubscribe(D())
-
-        try {
-            udpServer.waitClient()
-        } catch (e: IOException) {
-            loge("udp server exception")
-        }
-    }
-
-    inner class D : MainThreadDisposable() {
-        override fun onDispose() {
-            udpServer.kill()
-        }
-    }
-}
-
-class TransitionWaiterObservable : Observable<String>() {
-    private val tcpServer = TcpServer(TRANSFER_WAITER_PORT)
-
-    private var isLive: Boolean = true
-
-    override fun subscribeActual(observer: Observer<in String>?) {
-        observer?.onSubscribe(D())
-        tcpServer.waitClient()
-        while (isLive) {
-            val msg = tcpServer.receiveMessage()
-            logi("msg = $msg")
-            observer?.onNext(msg)
-        }
-    }
-
-    inner class D : MainThreadDisposable() {
-        override fun onDispose() {
-            isLive = false
-            tcpServer.close()
-        }
-    }
-}
 
