@@ -84,5 +84,5 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
 }
 
 const val SCAN_WAITER_PORT = 9992
-const val TRANSFER_WAITER_PORT = 23732
+const val TRANSFER_WAITER_PORT = 8832
 
