@@ -45,12 +45,11 @@ class ChatRoomActivity : RxAppCompatActivity() {
 
     private fun setupInput() {
         send.setOnClickListener {
-            send.text = ""
             val content = inputBox.text.toString()
             presenter.sendTextContent(content)
+            inputBox.setText("")
         }
     }
-
 
     private lateinit var itemAdapter: ItemAdapter
 
