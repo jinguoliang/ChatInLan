@@ -1,8 +1,7 @@
 package com.jone.lanchat
 
-import com.jone.lanchat.network.IPUtils
+import com.empty.jinux.baselibaray.log.loge
 import com.jone.lanchat.network.TcpClient
-import com.jone.lanchat.network.UdpScanner
 import com.jone.lanchat.utils.ioToUI
 import com.trello.rxlifecycle3.android.lifecycle.kotlin.bindToLifecycle
 import io.reactivex.Observable
@@ -12,32 +11,27 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
 
     private var client: TcpClient? = null
 
-    private var address: String? = null
+    private var addresses: MutableList<String> = mutableListOf()
 
-    private fun scanObservable(): Observable<List<String>> {
-        return Observable.create<List<String>> {
-            val addresses = UdpScanner(SCAN_WAITER_PORT).scan()
-                    .filter { it != IPUtils.getIPInLan()?.hostAddress }
-            if (addresses.isNotEmpty()) {
-                it.onNext(addresses)
-            }
-        }
+    private fun scanObservable(): Observable<String> {
+        return ScannerObservable()
     }
 
     private var scanDisposable: Disposable? = null
 
-    fun getOtherPoint(callback: (addresses: List<String>) -> Unit) {
+    fun getOtherPoint(callback: (addresses: String) -> Unit) {
         scanDisposable = scanObservable()
                 .ioToUI()
                 .bindToLifecycle(view)
-                .subscribe { addresses ->
-                    callback(addresses)
-                    address = addresses[0]
+//                .filter { it != IPUtils.getIPInLan()?.hostAddress }
+                .subscribe { address ->
+                    callback(address)
+                    addresses.add(address)
                 }
     }
 
     internal fun sendTextContent(content: String) {
-        address?.let {
+        addresses.forEach {
             createTransferClientObserver(it, content)
                     .ioToUI()
                     .subscribe()
@@ -49,15 +43,17 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
             if (client == null) {
                 client = TcpClient(it, TRANSFER_WAITER_PORT)
                 client?.connectReceiver()
+                loge("connected server")
             }
             client?.send(content)
+            loge("send")
         }
     }
 
     fun onActivityCreate() {
         startWaiting()
-        getOtherPoint { addresses ->
-            view.showOtherPoint(addresses)
+        getOtherPoint { address ->
+            view.showOtherPoint(address)
         }
     }
 

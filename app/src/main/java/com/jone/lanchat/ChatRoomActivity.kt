@@ -12,7 +12,6 @@ import com.empty.jinux.baselibaray.view.recycleview.ItemAdapter
 import com.empty.jinux.baselibaray.view.recycleview.ItemController
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.jone.lanchat.network.IPUtils
-import com.jone.lanchat.utils.showToast
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_home.*
@@ -55,7 +54,7 @@ class ChatRoomActivity : RxAppCompatActivity() {
 
     private fun setupChatList() {
         chatRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        chatRecyclerView.withItems {  }
+        chatRecyclerView.withItems { }
         itemAdapter = chatRecyclerView.adapter as ItemAdapter
     }
 
@@ -65,13 +64,8 @@ class ChatRoomActivity : RxAppCompatActivity() {
         }
     }
 
-    fun showOtherPoint(addresses: List<String>) {
-        addresses.forEach {
-            Toast.makeText(this@ChatRoomActivity, "receiver = $it", Toast.LENGTH_LONG).show()
-        }
-        if (addresses.isEmpty()) {
-            showToast(R.string.no_target)
-        }
+    fun showOtherPoint(address: String) {
+        Toast.makeText(this@ChatRoomActivity, "receiver = $address", Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroy() {

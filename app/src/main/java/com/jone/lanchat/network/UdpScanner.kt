@@ -1,6 +1,7 @@
 package com.jone.lanchat.network
 
 import android.util.Log
+import com.empty.jinux.baselibaray.log.logd
 import com.jone.lanchat.utils.Configuration
 import com.jone.lanchat.utils.runUntil
 import java.io.UnsupportedEncodingException
@@ -8,33 +9,41 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.SocketException
 import java.net.SocketTimeoutException
-import java.util.*
 
 /**
  */
 class UdpScanner(private val port: Int) : Scanner {
+    var isLive: Boolean = true
 
-    override fun scan(): List<String> {
+    override fun scan(onResult: (address: String) -> Unit) {
         try {
             val clientSocket = broadcast(Configuration.BROADCAST_DATA)
-            val addresses = waitResponse(clientSocket, Configuration.RESPONSE_DATA)
+            waitResponse(clientSocket, Configuration.RESPONSE_DATA, onResult)
             clientSocket.close()
-            return addresses
         } catch (e3: SocketException) {
             e3.printStackTrace()
         } catch (e: UnsupportedEncodingException) {
             e.printStackTrace()
         }
-
-        return Collections.emptyList()
     }
 
-    private fun waitResponse(clientSocket: DatagramSocket, expectResponse: String): List<String> {
+    fun kill() {
+        this.isLive = false
+    }
+
+    private fun waitResponse(
+            clientSocket: DatagramSocket,
+            expectResponse: String,
+            onResult: (address: String) -> Unit
+    ) {
         val receiveBuf = ByteArray(expectResponse.toByteArray().size)
         val receivePacket = DatagramPacket(receiveBuf, receiveBuf.size)
-        val addresses = ArrayList<String>()
 
-        runUntil(Configuration.SEARCH_TIMEOUT) {
+        runUntil (Configuration.SEARCH_TIMEOUT) {
+            if (!isLive) {
+                return@runUntil
+            }
+
             try {
                 clientSocket.receive(receivePacket)
                 Log.e(TAG, "search: receive " + receivePacket.address)
@@ -44,14 +53,12 @@ class UdpScanner(private val port: Int) : Scanner {
 
                 if (expectResponse == msg) {
                     Log.e(TAG, "search: matched")
-                    addresses.add(receivePacket.address.hostAddress)
+                    onResult(receivePacket.address.hostAddress)
                 }
             } catch (e: SocketTimeoutException) {
-                e.printStackTrace()
+                logd("timeout")
             }
         }
-
-        return addresses
     }
 
     private fun broadcast(msg: String): DatagramSocket {
