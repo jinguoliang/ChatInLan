@@ -19,10 +19,10 @@ class TcpServer(private val port: Int) {
 
     fun close() {
         try {
-            bufferedInputStream!!.close()
-            bufferedOutputStream!!.close()
-            serverSocket!!.close()
-            clientSocket!!.close()
+            bufferedInputStream?.close()
+            bufferedOutputStream?.close()
+            serverSocket?.close()
+            clientSocket?.close()
         } catch (e: IOException) {
             e.printStackTrace()
         }
