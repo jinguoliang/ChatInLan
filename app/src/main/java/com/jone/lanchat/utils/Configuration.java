@@ -10,7 +10,7 @@ public class Configuration {
     private static final int ONE_SECONDS = 1000;
 
 
-    public static final int SEARCH_TIMEOUT = 3 * ONE_SECONDS;
+    public static final int SEARCH_TIMEOUT = 30 * ONE_SECONDS;
     public static final int SEARCH_SOCKET_TIMEOUT = 3 * ONE_SECONDS;
 
 }
