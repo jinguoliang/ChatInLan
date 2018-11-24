@@ -1,5 +1,6 @@
 package com.jone.lanchat
 
+import com.jone.lanchat.network.IPUtils
 import com.jone.lanchat.network.TcpClient
 import com.jone.lanchat.network.UdpScanner
 import com.jone.lanchat.utils.ioToUI
@@ -16,7 +17,10 @@ class ChatRoomPresenter(val view: ChatRoomActivity) {
     private fun scanObservable(): Observable<List<String>> {
         return Observable.create<List<String>> {
             val addresses = UdpScanner(SCAN_WAITER_PORT).scan()
-            it.onNext(addresses)
+                    .filter { it != IPUtils.getIPInLan()?.hostAddress }
+            if (addresses.isNotEmpty()) {
+                it.onNext(addresses)
+            }
         }
     }
 
