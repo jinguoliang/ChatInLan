@@ -12,7 +12,7 @@ import java.net.Socket
  */
 class TcpServer(private val port: Int) {
 
-    private var serverSocket: ServerSocket? = null
+    private var serverSocket = ServerSocket(this.port)
     private var clientSocket: Socket? = null
     private var bufferedInputStream: BufferedInputStream? = null
     private var bufferedOutputStream: BufferedOutputStream? = null
@@ -31,7 +31,6 @@ class TcpServer(private val port: Int) {
 
     fun waitClient() {
         try {
-            serverSocket = ServerSocket(this.port)
             Log.e(TAG, "tcp server is accept")
             clientSocket = serverSocket!!.accept()
             Log.e(TAG, "tcp server is accepted")
@@ -57,6 +56,9 @@ class TcpServer(private val port: Int) {
         val buffer = ByteArray(MESSAGE_BUFFER_SIZE)
         try {
             val n = bufferedInputStream!!.read(buffer)
+            if (n == -1) {
+                return ""
+            }
             builder.append(String(buffer, 0, n))
         } catch (e: IOException) {
             e.printStackTrace()

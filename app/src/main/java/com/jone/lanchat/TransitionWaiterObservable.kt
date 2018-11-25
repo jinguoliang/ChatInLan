@@ -13,11 +13,15 @@ class TransitionWaiterObservable : Observable<String>() {
 
     override fun subscribeActual(observer: Observer<in String>?) {
         observer?.onSubscribe(D())
-        tcpServer.waitClient()
         while (isLive) {
-            val msg = tcpServer.receiveMessage()
-            logi("msg = $msg")
-            observer?.onNext(msg)
+            tcpServer.waitClient()
+
+            var msg = tcpServer.receiveMessage()
+            while (msg.isNotEmpty() && isLive) {
+                logi("msg = $msg")
+                observer?.onNext(msg)
+                msg = tcpServer.receiveMessage()
+            }
         }
     }
 

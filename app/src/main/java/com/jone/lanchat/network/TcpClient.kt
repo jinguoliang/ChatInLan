@@ -54,7 +54,7 @@ class TcpClient(private val serverAddress: String, private val serverPort: Int) 
 
         try {
             bufferedOutputStream!!.write(msg.toByteArray())
-            bufferedOutputStream!!.flush()
+            bufferedOutputStream!!.close()
             Log.e(TAG, "send: writed")
         } catch (e: IOException) {
             e.printStackTrace()
