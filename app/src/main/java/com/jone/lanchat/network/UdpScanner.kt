@@ -24,6 +24,8 @@ class UdpScanner(private val port: Int) : Scanner {
             e3.printStackTrace()
         } catch (e: UnsupportedEncodingException) {
             e.printStackTrace()
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
         }
     }
 

@@ -1,5 +1,8 @@
 package com.jone.lanchat
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +15,14 @@ import com.empty.jinux.baselibaray.view.recycleview.ItemAdapter
 import com.empty.jinux.baselibaray.view.recycleview.ItemController
 import com.empty.jinux.baselibaray.view.recycleview.withItems
 import com.jone.lanchat.network.IPUtils
+import com.jone.lanchat.utils.getSelectFileIntent
+import com.jone.lanchat.utils.showToast
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.item_chat_bubble.*
+import org.jetbrains.anko.longToast
 
 class ChatRoomActivity : RxAppCompatActivity() {
 
@@ -42,11 +48,16 @@ class ChatRoomActivity : RxAppCompatActivity() {
         my_ip.text = IPUtils.getIPInLan()?.hostAddress
     }
 
+    private val REQUEST_CODE_SELECT_FILE = 234
+
     private fun setupInput() {
         send.setOnClickListener {
             val content = inputBox.text.toString()
             presenter.sendTextContent(content)
             inputBox.setText("")
+        }
+        plus.setOnClickListener {
+            startActivityForResult(getSelectFileIntent(recentDirectoryUri), REQUEST_CODE_SELECT_FILE)
         }
     }
 
@@ -71,6 +82,27 @@ class ChatRoomActivity : RxAppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         presenter.onActivityDestroy()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            REQUEST_CODE_SELECT_FILE -> {
+                onSelectFileResult(resultCode, data)
+            }
+        }
+
+
+    }
+
+    private var recentDirectoryUri: Uri? = null
+
+    private fun onSelectFileResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_CANCELED || data == null) {
+            longToast(R.string.not_select_file)
+            return
+        }
+        recentDirectoryUri = data.data
+        showToast(data.data.toString())
     }
 }
 

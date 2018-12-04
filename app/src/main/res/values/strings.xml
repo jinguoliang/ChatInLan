@@ -10,4 +10,5 @@
     <string name="my_lan_ip">我的局域网 IP：</string>
     <string name="plus">+</string>
     <string name="no_target">没有扫描到目标</string>
+    <string name="not_select_file">没有选择文件</string>
 </resources>
